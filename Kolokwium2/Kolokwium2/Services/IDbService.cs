@@ -6,5 +6,7 @@ namespace Kolokwium2.Services;
 public interface IDbService
 {
     public Task<GetCharacterDto?> GetCharacterInfo(int characterId);
-    public Task AddCharacterItem(Backpack backpack);
+    public Task<Character?> GetCharacterWithBackpackAsync(int characterId);
+    public Task<List<Item>> GetItemsByIdsAsync(List<int> itemIds);
+    public Task<bool> AddItemsToCharacterBackpackAsync(Character character, List<Item> items);
 }

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Kolokwium2.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20240611105452_Init")]
+    [Migration("20240624230547_Init")]
     partial class Init
     {
         /// <inheritdoc />

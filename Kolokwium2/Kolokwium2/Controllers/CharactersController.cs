@@ -26,24 +26,29 @@ public class CharactersController : ControllerBase
 
         return Ok(character);
     }
-
-    [HttpPost("{characterId}")]
-    public async Task<IActionResult> AddCharacterItem(int characterId, AddItemDto addItemDto)
+    
+    [HttpPost("{characterId}/backpacks")]
+    public async Task<IActionResult> AddItemsToBackpack(int characterId, [FromBody] AddItemsDto addItemsDto)
     {
-        Backpack b = new Backpack();
-        /*Backpack b = new Backpack
-        {
-            Amount = addItemDto,
-            ItemId = addItemDto.ItemId,
-            CharacterId = addItemDto
-        };*/
-        using (var scope = new TransactionScope(TransactionScopeAsyncFlowOption.Enabled))
-        {
-            await _dbService.AddCharacterItem(b);
+        var character = await _dbService.GetCharacterWithBackpackAsync(characterId);
+        if (character == null)
+            return NotFound("Character not found");
 
-            scope.Complete();
-        }
+        var items = await _dbService.GetItemsByIdsAsync(addItemsDto.ItemIds);
+        if (items.Count != addItemsDto.ItemIds.Count)
+            return BadRequest("Some items do not exist");
 
-        return Created();
+        bool success = await _dbService.AddItemsToCharacterBackpackAsync(character, items);
+        if (!success)
+            return BadRequest("Character cannot carry more weight");
+
+        var response = character.Backpacks.Select(b => new
+        {
+            b.Amount,
+            b.ItemId,
+            b.CharacterId
+        }).ToList();
+
+        return Ok(response);
     }
 }
